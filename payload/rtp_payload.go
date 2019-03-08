@@ -1,9 +1,9 @@
 package payload
 
 type RtpPayload interface {
-	Alloc(param interface{}, bytes int) interface{}
-	Free(param interface{}, packet interface{})
-	Packet(param interface{}, packet interface{}, bytes int, timestamp uint32, flags int)
+	Alloc(param interface{}, bytes int) []byte
+	Free(param interface{}, packet []byte)
+	Packet(param interface{}, packet []byte, bytes int, timestamp uint32, flags int)
 }
 
 type RtpPayloadPacker interface {
@@ -42,5 +42,5 @@ type RtpPayloadUnpacker interface {
 	// @param[in] bytes RTP packet length in bytes
 	// @param[in] time stream UTC time
 	// @return 1-packet handled, 0-packet discard, <0-failed
-	Input(decoder interface{}, packet interface{}, bytes int) int
+	Input(packet []byte, bytes int) error
 }

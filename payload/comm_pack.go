@@ -1,7 +1,7 @@
 package payload
 
 import (
-	"github.com/pkg/errors"
+	"errors"
 	"github.com/services-go/librtp/rtp"
 )
 
@@ -51,7 +51,8 @@ func (p *CommPack) Input(data []byte, bytes int, timestamp uint32) error {
 	p.pkt.Header.Marker = 0            // marker bit alway 0
 
 	var n int
-	var r interface{}
+	var err error
+	var rtpb []byte
 	for ptr := data; bytes > 0; p.pkt.Header.SequenceNumber++ {
 		p.pkt.Payload = ptr[:]
 		p.pkt.PayloadLen = p.size - rtp.RtpFixedHeader
@@ -62,10 +63,22 @@ func (p *CommPack) Input(data []byte, bytes int, timestamp uint32) error {
 		ptr = ptr[p.pkt.PayloadLen:]
 		bytes -= p.pkt.PayloadLen
 		n = rtp.RtpFixedHeader + p.pkt.PayloadLen
-		r = p.handler.Alloc(p.cbparam, n)
-		if r == nil {
+		rtpb = p.handler.Alloc(p.cbparam, n)
+		if rtpb == nil {
 			return errors.New("rtp_pack alloc failed.")
 		}
 
+		n, err = rtp.RtpPacketSerialize(&p.pkt, rtpb, n)
+		if err != nil {
+			return err
+		}
+		if n != rtp.RtpFixedHeader+p.pkt.PayloadLen {
+			return errors.New("rtp packet serialize failed.")
+		}
+
+		p.handler.Packet(p.cbparam, rtpb, n, p.pkt.Header.Timestamp, 0)
+		p.handler.Free(p.cbparam, rtpb)
 	}
+
+	return nil
 }

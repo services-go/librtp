@@ -14,10 +14,10 @@ func (up *RtpUnpackH265) Create(handler RtpPayload, param interface{}) {
 
 }
 
-func (up *RtpUnpackH265) Destroy(packer interface{}) {
+func (up *RtpUnpackH265) Destroy() {
 
 }
 
-func (up *RtpUnpackH265) Input(packer interface{}) {
+func (up *RtpUnpackH265) Input(packet []byte, bytes int) error {
 
 }

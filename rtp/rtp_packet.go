@@ -1,6 +1,6 @@
 package rtp
 
-import "github.com/pkg/errors"
+import "errors"
 
 // RFC3550 RTP: A Transport Protocol for Real-Time Applications
 // 5.1 RTP Fixed Header Fields (p12)
@@ -89,3 +89,67 @@ func RtpPacketDeserialize(pkt *RtpPacket, data []byte, bytes int) error {
 	}
 	return nil
 }
+
+func RtpPacketSerializeHeader(pkt *RtpPacket, data []byte, bytes int) (int, error) {
+	if pkt.Header.Version != RtpVersion {
+		return 0, errors.New("rtp version error.")
+	}
+	if (pkt.Extlen % 4) != 0 {
+		return 0, errors.New("rtp extendlen error.")
+	}
+
+	﻿// RFC3550 5.1 RTP Fixed Header Fields(p12)
+	headlen := RtpFixedHeader + int(pkt.Header.CSRC * 4)
+	if pkt.Header.Extension > 0 {
+		headlen += 4
+	}
+	if bytes < headlen + int(pkt.Extlen) {
+		return 0, errors.New("rtp header error.")
+	}
+
+	ptr := data
+	WriteRtpHeader(ptr, &pkt.Header)
+	ptr = ptr[RtpFixedHeader:]
+
+	// ﻿pkt contributing source
+	for i := 0; i < int(pkt.Header.CSRC); i++ {
+		RtpWriteUint32(ptr, pkt.CSRC[i])
+		ptr = ptr[4:]
+	}
+
+	﻿// pkt header extension
+	if pkt.Header.Extension == 1 {
+		// ﻿5.3.1 RTP Header Extension
+		RtpWriteUint16(ptr, pkt.Reserved)
+		RtpWriteUint16(ptr[2:], pkt.Extlen / 4)
+		copy(ptr[4:], pkt.Extension[:pkt.Extlen])
+		ptr = ptr[pkt.Extlen + 4:]
+	}
+
+	return headlen + int(pkt.Extlen), nil
+}
+
+func RtpPacketSerialize(pkt *RtpPacket, data []byte, bytes int) (int, error) {
+	headlen, err := RtpPacketSerializeHeader(pkt, data, bytes)
+	if err != nil {
+		return 0, err
+	}
+	if headlen < RtpFixedHeader {
+		return 0, errors.New("Rtp fixed header error.")
+	}
+	if headlen + pkt.PayloadLen > bytes {
+		return 0, errors.New("bytes too small.")
+	}
+
+	copy(data[headlen:], pkt.Payload[:pkt.PayloadLen])
+	return headlen + pkt.PayloadLen, nil
+}
+
+
+
+
+
+
+
+
+

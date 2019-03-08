@@ -1,7 +1,7 @@
 package payload
 
 type RtpPayloadHelper struct {
-	handler   *RtpPayload
+	handler   RtpPayload
 	cbparam   interface{}
 	lost      int    // wait for next frame
 	flags     int    // lost packet
@@ -12,16 +12,7 @@ type RtpPayloadHelper struct {
 	capacity  int
 }
 
-func (h *RtpPayloadHelper) Create(handler RtpPayload, cbparam interface{}) {
-	//helper := &RtpPayloadHelper{
-	//	handler: h,
-	//	cbparam: cbparam,
-	//	flags:   -1,
-	//}
-
-}
-
-func (h *RtpPayloadHelper) Destroy(packer interface{}) {
+func (h *RtpPayloadHelper) Destroy() {
 	if h.ptr != nil {
 		h.ptr = nil
 	}

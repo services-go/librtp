@@ -16,16 +16,16 @@ type RtpPackMp4vES struct {
 // @param[in] handler user-defined callback
 // @param[in] cbparam user-defined parameter
 // @return RTP packer
-func (p *RtpPackMp4vES) Create(size int, payload uint8, seq uint16, ssrc uint32, handler RtpPayload, cbparam interface{}) {
+func (p *RtpPackMp4vES) Create(size int, payload uint8, seq uint16, ssrc uint32, handler RtpPayload, cbparam interface{}) RtpPayloadPacker {
 
 }
 
 // destroy RTP Packer
-func (p *RtpPackMp4vES) Destroy(packer interface{}) {
+func (p *RtpPackMp4vES) Destroy() {
 
 }
 
-func (p *RtpPackMp4vES) GetInfo(packer interface{}) (seq uint16, timestamp uint32) {
+func (p *RtpPackMp4vES) GetInfo() (seq uint16, timestamp uint32) {
 	return 0, 0
 }
 
@@ -35,6 +35,6 @@ func (p *RtpPackMp4vES) GetInfo(packer interface{}) (seq uint16, timestamp uint3
 // @param[in] bytes stream length in bytes
 // @param[in] time stream UTC time
 // @return 0-ok, ENOMEM-alloc failed, <0-failed
-func (p *RtpPackMp4vES) Input(packer interface{}, data interface{}, bytes int, timestamp uint32) {
+func (p *RtpPackMp4vES) Input(data []byte, bytes int, timestamp uint32) error {
 
 }
