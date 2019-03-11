@@ -43,7 +43,6 @@ func (p *payloadPacker) Handle(param interface{}, packet []byte, bytes int, time
 	size[1] = byte(bytes)
 
 	ctx, _ := param.(*RtpPayloadTest)
-	fmt.Printf("22 frtp2 = %p\n", ctx.frtp2)
 	ctx.frtp2.Write(size)
 	ctx.frtp2.Write(packet)
 }
@@ -118,7 +117,6 @@ func rtpPayloadTest(pt int, encoding string, seq uint16, ssrc uint32, rtpfile st
 
 	}
 	defer ctx.frtp2.Close()
-	fmt.Printf("11 frtp2 = %p\n", ctx.frtp2)
 
 	ctx.fsource2, err = os.OpenFile("out.media", os.O_RDWR|os.O_APPEND|os.O_CREATE, 0644)
 	if err != nil {
@@ -126,8 +124,6 @@ func rtpPayloadTest(pt int, encoding string, seq uint16, ssrc uint32, rtpfile st
 		return
 	}
 	defer ctx.fsource2.Close()
-
-	fmt.Printf("11 ctx fsource2 = %p\n", ctx.fsource2)
 
 	var p payloadPacker
 	var up payloadUnpacker
@@ -148,6 +144,7 @@ func rtpPayloadTest(pt int, encoding string, seq uint16, ssrc uint32, rtpfile st
 
 		ctx.size = int(sz[0])<<8 | int(sz[1])
 
+		fmt.Printf("size = %d, sz[0] = %x sz[1] = %x\n", ctx.size, sz[0], sz[1])
 		n, err = ctx.frtp.Read(ctx.packet[:ctx.size])
 		if err != nil || n != ctx.size {
 			log.Println(err)

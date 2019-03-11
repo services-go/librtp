@@ -51,6 +51,7 @@ type RtpPackH264 struct {
 func (p *RtpPackH264) Init(size int, payload uint8, seq uint16, ssrc uint32, handler RtpPayload, cbparam interface{}) {
 	p.handler = handler
 	p.size = size
+	p.cbparam = cbparam
 
 	p.pkt.Header.Version = rtp.RtpVersion
 	p.pkt.Header.PayloadType = payload
