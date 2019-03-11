@@ -17,7 +17,7 @@ type RtpPackMp4vES struct {
 // @param[in] cbparam user-defined parameter
 // @return RTP packer
 func (p *RtpPackMp4vES) Create(size int, payload uint8, seq uint16, ssrc uint32, handler RtpPayload, cbparam interface{}) RtpPayloadPacker {
-
+	return nil
 }
 
 // destroy RTP Packer
@@ -36,5 +36,5 @@ func (p *RtpPackMp4vES) GetInfo() (seq uint16, timestamp uint32) {
 // @param[in] time stream UTC time
 // @return 0-ok, ENOMEM-alloc failed, <0-failed
 func (p *RtpPackMp4vES) Input(data []byte, bytes int, timestamp uint32) error {
-
+	return nil
 }

@@ -5,30 +5,28 @@ import (
 	"github.com/services-go/librtp/rtp"
 )
 
-type CommPack struct {
+type RtpCommPack struct {
 	handler RtpPayload
 	cbparam interface{}
 	pkt     rtp.RtpPacket
 	size    int
 }
 
-func (p CommPack) Create(size int, payload uint8, seq uint16, ssrc uint32, handler RtpPayload, cbparam interface{}) RtpPayloadPacker {
-	pack := &CommPack{}
-	pack.cbparam = cbparam
-	pack.size = size
+func (p *RtpCommPack) Init(size int, payload uint8, seq uint16, ssrc uint32, handler RtpPayload, cbparam interface{}) {
+	p.cbparam = cbparam
+	p.size = size
 
-	pack.pkt.Header.Version = rtp.RtpVersion
-	pack.pkt.Header.PayloadType = payload
-	pack.pkt.Header.SequenceNumber = seq
-	pack.pkt.Header.SSRC = ssrc
-	return pack
+	p.pkt.Header.Version = rtp.RtpVersion
+	p.pkt.Header.PayloadType = payload
+	p.pkt.Header.SequenceNumber = seq
+	p.pkt.Header.SSRC = ssrc
 }
 
 // destroy RTP Packer
-func (p *CommPack) Destroy() {
+func (p *RtpCommPack) Destroy() {
 }
 
-func (p *CommPack) GetInfo() (seq uint16, timestamp uint32) {
+func (p *RtpCommPack) GetInfo() (seq uint16, timestamp uint32) {
 	return p.pkt.Header.SequenceNumber, p.pkt.Header.Timestamp
 }
 
@@ -38,7 +36,7 @@ func (p *CommPack) GetInfo() (seq uint16, timestamp uint32) {
 // @param[in] bytes stream length in bytes
 // @param[in] time stream UTC time
 // @return 0-ok, ENOMEM-alloc failed, <0-failed
-func (p *CommPack) Input(data []byte, bytes int, timestamp uint32) error {
+func (p *RtpCommPack) Input(data []byte, bytes int, timestamp uint32) error {
 	if p.pkt.Payload != nil {
 		return errors.New("not first packet.")
 	}
@@ -76,7 +74,7 @@ func (p *CommPack) Input(data []byte, bytes int, timestamp uint32) error {
 			return errors.New("rtp packet serialize failed.")
 		}
 
-		p.handler.Packet(p.cbparam, rtpb, n, p.pkt.Header.Timestamp, 0)
+		p.handler.Handle(p.cbparam, rtpb, n, p.pkt.Header.Timestamp, 0)
 		p.handler.Free(p.cbparam, rtpb)
 	}
 

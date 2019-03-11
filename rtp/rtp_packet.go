@@ -1,6 +1,8 @@
 package rtp
 
-import "errors"
+import (
+	"errors"
+)
 
 // RFC3550 RTP: A Transport Protocol for Real-Time Applications
 // 5.1 RTP Fixed Header Fields (p12)
@@ -18,7 +20,6 @@ import "errors"
 |                               ....                            |
 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 */
-
 func RtpPacketDeserialize(pkt *RtpPacket, data []byte, bytes int) error {
 	// RFC3550 5.1 RTP Fixed Header Fields(p12)
 	if bytes < RtpFixedHeader {
@@ -98,12 +99,12 @@ func RtpPacketSerializeHeader(pkt *RtpPacket, data []byte, bytes int) (int, erro
 		return 0, errors.New("rtp extendlen error.")
 	}
 
-	﻿// RFC3550 5.1 RTP Fixed Header Fields(p12)
-	headlen := RtpFixedHeader + int(pkt.Header.CSRC * 4)
+	// RFC3550 5.1 RTP Fixed Header Fields(p12)
+	headlen := RtpFixedHeader + int(pkt.Header.CSRC*4)
 	if pkt.Header.Extension > 0 {
 		headlen += 4
 	}
-	if bytes < headlen + int(pkt.Extlen) {
+	if bytes < headlen+int(pkt.Extlen) {
 		return 0, errors.New("rtp header error.")
 	}
 
@@ -111,19 +112,17 @@ func RtpPacketSerializeHeader(pkt *RtpPacket, data []byte, bytes int) (int, erro
 	WriteRtpHeader(ptr, &pkt.Header)
 	ptr = ptr[RtpFixedHeader:]
 
-	// ﻿pkt contributing source
 	for i := 0; i < int(pkt.Header.CSRC); i++ {
 		RtpWriteUint32(ptr, pkt.CSRC[i])
 		ptr = ptr[4:]
 	}
 
-	﻿// pkt header extension
+	// pkt header extension
 	if pkt.Header.Extension == 1 {
-		// ﻿5.3.1 RTP Header Extension
 		RtpWriteUint16(ptr, pkt.Reserved)
-		RtpWriteUint16(ptr[2:], pkt.Extlen / 4)
+		RtpWriteUint16(ptr[2:], pkt.Extlen/4)
 		copy(ptr[4:], pkt.Extension[:pkt.Extlen])
-		ptr = ptr[pkt.Extlen + 4:]
+		ptr = ptr[pkt.Extlen+4:]
 	}
 
 	return headlen + int(pkt.Extlen), nil
@@ -137,19 +136,10 @@ func RtpPacketSerialize(pkt *RtpPacket, data []byte, bytes int) (int, error) {
 	if headlen < RtpFixedHeader {
 		return 0, errors.New("Rtp fixed header error.")
 	}
-	if headlen + pkt.PayloadLen > bytes {
+	if headlen+pkt.PayloadLen > bytes {
 		return 0, errors.New("bytes too small.")
 	}
 
 	copy(data[headlen:], pkt.Payload[:pkt.PayloadLen])
 	return headlen + pkt.PayloadLen, nil
 }
-
-
-
-
-
-
-
-
-

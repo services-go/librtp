@@ -5,30 +5,25 @@ import (
 	"github.com/services-go/librtp/rtp"
 )
 
-type RtpUnpack struct {
+type RtpCommUnpack struct {
 	RtpPayloadHelper
 }
 
-func (up RtpUnpack) Create(h RtpPayload, cbparam interface{}) RtpPayloadUnpacker {
-	unpack := &RtpUnpack{
-		RtpPayloadHelper{
-			handler: h,
-			cbparam: cbparam,
-			flags:   -1,
-		},
-	}
-	return unpack
+func (up *RtpCommUnpack) Init(h RtpPayload, cbparam interface{}) {
+	up.handler = h
+	up.cbparam = cbparam
+	up.flags = -1
 }
 
-func (up *RtpUnpack) Input(packet []byte, bytes int) error {
+func (up *RtpCommUnpack) Input(packet []byte, bytes int) (int, error) {
 	var pkt rtp.RtpPacket
 	err := rtp.RtpPacketDeserialize(&pkt, packet, bytes)
 	if err != nil {
-		return err
+		return -1, err
 	}
 	if pkt.PayloadLen < 1 {
-		return errors.New("rtp payload len < 1.")
+		return -1, errors.New("rtp payload len < 1.")
 	}
-	up.handler.Packet(up.cbparam, pkt.Payload, pkt.PayloadLen, pkt.Header.Timestamp, 0)
-	return nil
+	up.handler.Handle(up.cbparam, pkt.Payload, pkt.PayloadLen, pkt.Header.Timestamp, 0)
+	return 1, nil
 }

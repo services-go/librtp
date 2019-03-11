@@ -5,7 +5,7 @@ func RtpReadUint16(ptr []byte) uint16 {
 }
 
 func RtpReadUint32(ptr []byte) uint32 {
-	return uint32(ptr[0])<<24 | uint32(ptr[1]<<16) | uint32(ptr[2]<<8) | uint32(ptr[3])
+	return uint32(ptr[0])<<24 | uint32(ptr[1])<<16 | uint32(ptr[2])<<8 | uint32(ptr[3])
 }
 
 func RtpWriteUint16(ptr []byte, val uint16) {

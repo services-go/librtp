@@ -17,7 +17,7 @@ type RtpPackMp4aLatm struct {
 // @param[in] cbparam user-defined parameter
 // @return RTP packer
 func (p RtpPackMp4aLatm) Create(size int, payload uint8, seq uint16, ssrc uint32, handler RtpPayload, cbparam interface{}) RtpPayloadPacker {
-
+	return nil
 }
 
 // destroy RTP Packer

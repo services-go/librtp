@@ -1,5 +1,7 @@
 package rtp
 
+const KHZ = 90 // 90000Hz
+
 const (
 	RtpVersion     = 2  // RTP version field must equal 2 (p66)
 	RtpFixedHeader = 12 // the header fixed 12 byte
